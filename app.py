@@ -1,7 +1,7 @@
 import json
 import os
 import urllib.request
-from flask import Flask, Response, abort
+from flask import Flask, Response, abort, request
 
 app = Flask(__name__)
 
@@ -88,6 +88,25 @@ def live_kml():
                         headers={"Cache-Control": "no-cache, no-store"})
     except Exception as e:
         abort(502, str(e))
+
+
+@app.route("/track.kml")
+def track_kml():
+    host = request.host_url.rstrip('/')
+    kml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <NetworkLink>
+    <name>{DEFAULT_TEAM} — USARA 2026 (Live)</name>
+    <open>1</open>
+    <Link>
+      <href>{host}/live.kml</href>
+      <refreshMode>onInterval</refreshMode>
+      <refreshInterval>30</refreshInterval>
+    </Link>
+  </NetworkLink>
+</kml>'''
+    return Response(kml.encode(), mimetype="application/vnd.google-earth.kml+xml",
+                    headers={"Cache-Control": "no-cache, no-store"})
 
 
 @app.route("/")
