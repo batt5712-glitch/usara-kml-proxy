@@ -92,7 +92,9 @@ def live_kml():
 
 @app.route("/track.kml")
 def track_kml():
-    host = request.host_url.rstrip('/')
+    # Render terminates SSL at its load balancer; use X-Forwarded-Proto for correct scheme
+    proto = request.headers.get("X-Forwarded-Proto", "https")
+    host = f"{proto}://{request.host}"
     kml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <NetworkLink>
